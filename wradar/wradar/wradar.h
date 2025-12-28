@@ -56,8 +56,10 @@ public:
 		uintptr_t _p_AttributeManager;
 		uintptr_t _pItem;
 		uintptr_t _piItemDefinitionIndex;
-	};
-	RO m_stRuntimeOffsets;
+
+		uintptr_t _pGameEntitySystem;
+		uintptr_t _nHighestEntityIndex;
+	} m_stRuntimeOffsets;
 private:
 	Proxy* m_pProxy;
 

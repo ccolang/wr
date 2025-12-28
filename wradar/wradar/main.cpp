@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
 				while (std::getline(ss, token, delim)) tokens.push_back(token);
 				return tokens;
 				};
+
 			auto logsuccess = [](std::string format) {
 				std::cerr << "[" << std::format("{:%H:%M:%S}", std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now())) << "] [INFO] " << format << std::endl;
 				};

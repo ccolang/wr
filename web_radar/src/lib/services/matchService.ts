@@ -17,6 +17,8 @@ export interface WebSocketCallbacks {
     onMatchData: (data: MatchData) => void;
 }
 
+import { decode } from "@msgpack/msgpack";
+
 export function createWebSocketConnection(
     url: string,
     maps: CSMap[],
@@ -31,6 +33,7 @@ export function createWebSocketConnection(
 
         callbacks.onStatusChange("connecting");
         ws = new WebSocket(url);
+        ws.binaryType = "arraybuffer";
 
         ws.onopen = () => {
             callbacks.onStatusChange("connected");
@@ -47,7 +50,14 @@ export function createWebSocketConnection(
 
         ws.onmessage = (event) => {
             callbacks.onStatusChange("connected");
-            const data = JSON.parse(event.data);
+
+            let data: any;
+            if (event.data instanceof ArrayBuffer) {
+                data = decode(new Uint8Array(event.data));
+            } else {
+                data = JSON.parse(event.data);
+            }
+
             if (!maps.length) return;
 
             const players: Player[] = data.players;
