@@ -1,10 +1,11 @@
-# wr | A CS2 Webradar
-wr is a fork of [CS2 Webradar](https://github.com/juvoy/wradar/)
+# WRadar | A CS2 Webradar
+WRadar is a small side project of mine. Yes the frontend is a endless spaghetti code mess but I'm to lazy to fix it (sorry :c).
 To see a showcase scroll allll the way down. ([Screenshots](#screenshots))
 
 ## Warning
 This will get you banned if you start cs2 with the precompiled executable, if you are on windows 10 you can use Handle Hijacking.
 If you want to use this undetected you can using your own driver see (See [Custom](#custom)). 
+For any question you can add me on discord: @juvoy
 
 ## Features
 - **Player Tracking:** View the current position and rotation of any player.  
@@ -71,3 +72,8 @@ uintptr_t GetModuleBase(std::string mod);
 ## Screenshots
 ![Dashboard](screenshots/screenshot_full.png)
 ![Settings](screenshots/screenshot_settings.png)  
+
+## Thanks
+<a href="https://github.com/juvoy/wradar/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=juvoy/wradar"/>
+</a>
