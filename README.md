@@ -1,5 +1,5 @@
 # WRadar | A CS2 Webradar
-WRadar is a small side project of mine. Yes the frontend is a endless spaghetti code mess but I'm to lazy to fix it (sorry :c).
+WRadar is a small side project of mine. Fronted fixed by ccolang big thanks.
 To see a showcase scroll allll the way down. ([Screenshots](#screenshots))
 
 ## Warning
