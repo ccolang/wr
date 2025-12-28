@@ -198,7 +198,7 @@ void WRadar::Start() {
             if (!listEntry)
                 continue;
 
-            uintptr_t playerController = m_pProxy->ReadMemory<uintptr_t>(listEntry + 0x78 * (i & 0x1FF));
+            uintptr_t playerController = m_pProxy->ReadMemory<uintptr_t>(listEntry + 112 * (i & 0x1FF));
             if (!playerController)
                 continue;
 
@@ -210,7 +210,7 @@ void WRadar::Start() {
             if (!listEntry2)
                 continue;
 
-            uintptr_t pCSPlayerPawn = m_pProxy->ReadMemory<uintptr_t>(listEntry2 + 120 * (pawnHandle & 0x1FF));
+            uintptr_t pCSPlayerPawn = m_pProxy->ReadMemory<uintptr_t>(listEntry2 + 112 * (pawnHandle & 0x1FF));
             if (!pCSPlayerPawn)
                 continue;
 
@@ -270,7 +270,7 @@ void WRadar::Start() {
                 uintptr_t listEntry = m_pProxy->ReadMemory<uintptr_t>(entityList + (0x8 * (entity_from_handle(entityIndex) >> 9)) + 0x10);
                 if (!listEntry)
                     continue;
-                uintptr_t listEntry2 = m_pProxy->ReadMemory<uintptr_t>(listEntry + 120 * (entityIndex & 0x1FF));
+                uintptr_t listEntry2 = m_pProxy->ReadMemory<uintptr_t>(listEntry + 112 * (entityIndex & 0x1FF));
                 if (!listEntry2)
                     continue;
 
