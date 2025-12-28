@@ -12,13 +12,9 @@
 #include <array>
 #include <ixwebsocket/IXWebSocketServer.h>
 
-WRadar::WRadar()
+WRadar::WRadar() : m_hMutex(0), m_bVerbose(false), m_strHost("0.0.0.0"), m_lPort(8080)
 {
 	this->m_pProxy = new Proxy();
-
-    this->m_bVerbose = false;
-    this->m_strHost = "0.0.0.0";
-    this->m_lPort = 8080;
     this->m_osFile = {};
 
     this->m_stRuntimeOffsets = {};
@@ -52,6 +48,10 @@ WRadar::WRadar()
     this->m_stRuntimeOffsets._p_AttributeManager = cs2_dumper::schemas::client_dll::C_EconEntity::m_AttributeManager;
     this->m_stRuntimeOffsets._pItem = cs2_dumper::schemas::client_dll::C_AttributeContainer::m_Item;
     this->m_stRuntimeOffsets._piItemDefinitionIndex = cs2_dumper::schemas::client_dll::C_EconItemView::m_iItemDefinitionIndex;
+
+    this->m_stRuntimeOffsets._pGameEntitySystem = cs2_dumper::offsets::client_dll::dwGameEntitySystem;
+    this->m_stRuntimeOffsets._nHighestEntityIndex = cs2_dumper::offsets::client_dll::dwGameEntitySystem_highestEntityIndex;
+
 }
 
 WRadar::~WRadar()
@@ -167,7 +167,10 @@ void WRadar::Start() {
         info["map"] = map;
         info["score"] = nlohmann::json::array();
 
-        for (int i = 64; i < 1024; i++)
+        uintptr_t pNetworkGameClient = m_pProxy->ReadMemory<uintptr_t>(m_pProxy->GetModuleBase("client.dll") + this->m_stRuntimeOffsets._pGameEntitySystem);
+        int _highestEntityIndex = m_pProxy->ReadMemory<int>(pNetworkGameClient + this->m_stRuntimeOffsets._nHighestEntityIndex);
+
+        for (int i = 64; i < _highestEntityIndex; i++)
         {
             uintptr_t listEntry = m_pProxy->ReadMemory<uintptr_t>(entityList + (0x8 * (entity_from_handle(i) >> 9)) + 0x10);
             if (!listEntry)
@@ -188,7 +191,6 @@ void WRadar::Start() {
                 score["team"] = buffer.data();
                 score["score"] = teamScore;
                 info["score"].push_back(score);
-                std::this_thread::sleep_for(std::chrono::nanoseconds(1));
             }
         }
 
@@ -198,7 +200,7 @@ void WRadar::Start() {
             if (!listEntry)
                 continue;
 
-            uintptr_t playerController = m_pProxy->ReadMemory<uintptr_t>(listEntry + 0x78 * (i & 0x1FF));
+            uintptr_t playerController = m_pProxy->ReadMemory<uintptr_t>(listEntry + 112 * (i & 0x1FF));
             if (!playerController)
                 continue;
 
@@ -210,11 +212,9 @@ void WRadar::Start() {
             if (!listEntry2)
                 continue;
 
-            uintptr_t pCSPlayerPawn = m_pProxy->ReadMemory<uintptr_t>(listEntry2 + 120 * (pawnHandle & 0x1FF));
+            uintptr_t pCSPlayerPawn = m_pProxy->ReadMemory<uintptr_t>(listEntry2 + 112 * (pawnHandle & 0x1FF));
             if (!pCSPlayerPawn)
                 continue;
-
-            
 
 
             auto buffer = m_pProxy->ReadMemory<std::array<char, 128>>(playerController + this->m_stRuntimeOffsets._p_iszPlayerName);
@@ -270,7 +270,7 @@ void WRadar::Start() {
                 uintptr_t listEntry = m_pProxy->ReadMemory<uintptr_t>(entityList + (0x8 * (entity_from_handle(entityIndex) >> 9)) + 0x10);
                 if (!listEntry)
                     continue;
-                uintptr_t listEntry2 = m_pProxy->ReadMemory<uintptr_t>(listEntry + 120 * (entityIndex & 0x1FF));
+                uintptr_t listEntry2 = m_pProxy->ReadMemory<uintptr_t>(listEntry + 112 * (entityIndex & 0x1FF));
                 if (!listEntry2)
                     continue;
 
@@ -286,7 +286,7 @@ void WRadar::Start() {
             }
 
             info["players"].push_back(player);
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+
         }
 
         uintptr_t gameRules = m_pProxy->ReadMemory<uintptr_t>(m_pProxy->GetModuleBase("client.dll") + this->m_stRuntimeOffsets._pGameRules);
@@ -309,7 +309,7 @@ void WRadar::Start() {
         info["bomb"].push_back(bombInfo);
 
         for (auto& cl : server.getClients()) {
-            cl->send(info.dump());
+            cl->sendBinary(nlohmann::json::to_msgpack(info));
         }
 
         std::this_thread::sleep_for(std::chrono::nanoseconds(1));
