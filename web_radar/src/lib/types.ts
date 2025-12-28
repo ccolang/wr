@@ -18,7 +18,7 @@ export interface Score {
   team: string;
   score: number;
 }
-export interface CSMainterfacep {
+export interface CSMap {
   map_name: string;
   pos_x: number;
   pos_y: number;
